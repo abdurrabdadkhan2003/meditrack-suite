@@ -1,0 +1,61 @@
+version: '3.9'
+
+services:
+  meditrack-db:
+    image: postgres:15-alpine
+    container_name: meditrack_postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-meditrack_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../meditrack-core-db/schema:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d meditrack_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - meditrack_net
+
+  clinic-ops-api:
+    build:
+      context: ../clinic-ops-api
+      dockerfile: Dockerfile
+    container_name: meditrack_fastapi_server
+    restart: unless-stopped
+    depends_on:
+      meditrack-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@meditrack-db:5432/meditrack_dev
+    ports:
+      - "8000:8000"
+    networks:
+      - meditrack_net
+
+  health-bi-dashboard:
+    build:
+      context: ../health-bi-dashboard
+      dockerfile: Dockerfile
+    container_name: meditrack_streamlit_bi
+    restart: unless-stopped
+    depends_on:
+      - clinic-ops-api
+    environment:
+      API_URL: http://clinic-ops-api:8000
+    ports:
+      - "8501:8501"
+    networks:
+      - meditrack_net
+
+volumes:
+  pgdata:
+
+networks:
+  meditrack_net:
+    driver: bridge

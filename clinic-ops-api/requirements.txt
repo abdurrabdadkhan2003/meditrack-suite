@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+psycopg2-binary
+pip install "python-jose[cryptography]" "passlib[bcrypt]" python-multipart

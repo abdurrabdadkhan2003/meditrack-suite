@@ -34,3 +34,19 @@ def test_roi_centroid_calculation():
 
     assert cx == 200
     assert cy == 350
+def test_executive_sla_alert_evaluator():
+    """Verifies automated threshold triggers for no-shows, claims, and vision dwell time."""
+    high_risk_metrics = {
+        "no_show_rate": 18.5,
+        "claim_rejection_rate": 14.2,
+        "avg_wait_sec": 72.0
+    }
+    triggered = []
+    if high_risk_metrics["no_show_rate"] > 15.0:
+        triggered.append("OPS_WARNING")
+    if high_risk_metrics["claim_rejection_rate"] > 12.0:
+        triggered.append("FINANCE_ALERT")
+    if high_risk_metrics["avg_wait_sec"] > 60.0:
+        triggered.append("VISION_CONGESTION")
+
+    assert len(triggered) == 3

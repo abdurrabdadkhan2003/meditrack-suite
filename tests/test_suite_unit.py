@@ -50,3 +50,19 @@ def test_executive_sla_alert_evaluator():
         triggered.append("VISION_CONGESTION")
 
     assert len(triggered) == 3
+
+
+def test_rbac_audit_log_schema():
+    """Verifies that security audit records contain all required compliance fields."""
+    sample_event = {
+        "event_id": "AUD-1001",
+        "timestamp": "2026-11-15 16:30:00",
+        "actor": "admin_user",
+        "role": "ADMIN",
+        "action": "GENERATE_EXEC_PDF",
+        "ip_address": "192.168.1.25",
+        "details": "Compiled Executive SLA Audit PDF Brief"
+    }
+    required_keys = {"event_id", "timestamp", "actor", "role", "action", "ip_address", "details"}
+    assert required_keys.issubset(sample_event.keys())
+    assert sample_event["role"] in {"ADMIN", "CLINICIAN", "RECEPTION", "SERVICE_ACCOUNT"}

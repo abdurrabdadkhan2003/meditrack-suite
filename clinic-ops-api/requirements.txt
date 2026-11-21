@@ -4,4 +4,7 @@ sqlalchemy
 pydantic
 pydantic-settings
 psycopg2-binary
-pip install "python-jose[cryptography]" "passlib[bcrypt]" python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt<4.0.0
+python-multipart

@@ -1,3 +1,0 @@
-# Ignore YOLO model weights and video data
-*.pt
-data/
